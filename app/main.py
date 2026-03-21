@@ -4,6 +4,7 @@ from app.models import user, transaction
 from app.routes.auth import router as auth_router
 from app.routes.transactions import router as transaction_router
 
+
 app = FastAPI()
 Base.metadata.create_all(bind=engine)
 

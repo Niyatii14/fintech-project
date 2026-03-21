@@ -14,3 +14,14 @@ def create_new_transaction(
     current_user = Depends(get_current_user)
 ):
     return create_transaction(db, transaction, current_user.id)
+
+@router.get("transactions", response_model = list[TransactionResponse])
+def get_transactions(
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    transactions = db.query(Transaction).filter(
+        Transaction.user_id == current_user.id
+    ).all()
+    return transactions
+
