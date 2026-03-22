@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.schemas.transaction import TransactionCreate, TransactionResponse
-from app.services.transaction_service import create_transaction
+from app.services.transaction_service import create_transaction, delete_transaction, update_transaction
 from app.core.dependencies import get_current_user
+from app.models.transaction import Transaction
 
 router = APIRouter()
 @router.post("/transactions", response_model=TransactionResponse)
@@ -15,7 +16,7 @@ def create_new_transaction(
 ):
     return create_transaction(db, transaction, current_user.id)
 
-@router.get("transactions", response_model = list[TransactionResponse])
+@router.get("/transactions", response_model = list[TransactionResponse])
 def get_transactions(
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
@@ -40,7 +41,7 @@ def delete_user_transaction(
     
     return {"message": "Transaction deleted"}
 
-@router.put("/transaction/{id}",response_model=TransactionResponse)
+@router.put("/transactions/{id}",response_model=TransactionResponse)
 def update_user_transaction(
     id: int,
     data: TransactionCreate,
