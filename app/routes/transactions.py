@@ -25,3 +25,34 @@ def get_transactions(
     ).all()
     return transactions
 
+@router.delete("/transactions/{id}")
+def delete_user_transaction(
+    id: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    result = delete_transaction(db, id, current_user.id)
+
+    if result == "unauthorized":
+        raise HTTPException(status_code=403, detail="Not allowed")
+    if not result:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    
+    return {"message": "Transaction deleted"}
+
+@router.put("/transaction/{id}",response_model=TransactionResponse)
+def update_user_transaction(
+    id: int,
+    data: TransactionCreate,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    result = update_transaction(db, id, current_user.id, data)
+    if result == "unauthorized":
+        raise HTTPException(status_code=403, detail = "Not allowed")
+    
+    if not result:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    
+    return result
+
